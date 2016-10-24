@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "newLine": "LF",        
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitThis": true,
+        "noUnusedParameters": true,
+        "strictNullChecks": true,
+        "moduleResolution": "node"
+    },
+    "include": [
+        "./node_modules/@types/react/index.d.ts",
+        "./node_modules/@types/react-dom/index.d.ts",
+        "src/**/*"
+    ],
+    "exclude": [
+        // "node_modules",
+        "**/*.spec.ts"
+    ]
+}

@@ -1,0 +1,13 @@
+$color: blue;
+
+.helloColor {
+    color: $color;
+
+    &.helloBackgroundColor {
+        background-color: white;
+    }
+}
+
+.unusedColor {
+    color: red;
+}
