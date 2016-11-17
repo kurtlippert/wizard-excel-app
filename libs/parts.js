@@ -1,8 +1,12 @@
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const hashFile = require('hash-file'); 
-const hashFiles = require('hash-files'); 
+const PurifyCSSPlugin = require('purifycss-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+const hashFile = require('hash-file');
+const hashFiles = require('hash-files');
 const fs = require('fs');
 const crypto = require('crypto');
 
@@ -57,8 +61,8 @@ exports.setupCSS = function (paths) {
         module: {
             loaders: [
                 {
-                    test: /\.css$/,
-                    loaders: ['style', 'css?modules'],
+                    test: /\.scss$/,
+                    loaders: ['style', 'css?sourceMap&modules!sass?sourceMap'],
                     include: paths
                 }
             ]
@@ -141,7 +145,7 @@ exports.clean = function (path) {
 
 exports.extractCSS = function (paths) {
     // Calc hash for style bundle name
-    const fsContents = paths.map(function(path) {
+    const fsContents = paths.map(function (path) {
         return fs.readFileSync(path);
     }).join();
     const fileHash = crypto.createHash('sha256').update(fsContents).digest("hex").substring(0, 20);
@@ -183,7 +187,37 @@ exports.extractCSS = function (paths) {
             // Output extracted CSS to a file
             new ExtractTextPlugin({
                 filename: 'style.' + fileHash + '.css',
-            })
+            }),
+            new OptimizeCSSAssetsPlugin()
         ]
     };
 }
+
+exports.compress = function () {
+    return {
+        plugins: [
+            new CompressionPlugin({
+                test: /\.js$|\.html$|\.css$/
+            })
+        ]
+    }
+}
+
+// exports.purifyCSS = function (paths) {
+//     console.log(process.cwd() + '/dist');
+//     return {
+//         plugins: [
+//             new PurifyCSSPlugin({
+//                 basePath: process.cwd(),
+
+//                 // 'paths' is used to point purifyCSS to files not
+//                 // visible to Webpack. You can pass glob patterns to it
+//                 paths: paths,
+
+//                 options: {
+//                     output: process.cwd + 'distcss'
+//                 }
+//             })
+//         ]
+//     };
+// }
