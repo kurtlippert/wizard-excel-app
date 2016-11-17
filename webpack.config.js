@@ -7,6 +7,10 @@ const parts = require('./libs/parts');
 const glob = require('glob');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+const min = (process.env.npm_lifecycle_event === 'webpack:build') ?
+            '.min' :
+            '';
+
 const PATHS = {
     // src: path.join(__dirname, 'src', '**', '*.tsx'),
     // style: path.join(__dirname, 'src', '**', '*.css'),
@@ -23,7 +27,6 @@ const common = {
         // src: glob.sync(PATHS.src),
         // style: glob.sync(PATHS.style)
         src: PATHS.src,
-
     },
 
     output: {
@@ -63,14 +66,15 @@ const common = {
         ]
     },
 
+    // If production, I want minified cdn version, full otherwise
     plugins: [
         new HtmlWebpackPlugin({
             template: 'index.template.ejs',
             title: 'Onboarding Wizard',
             inject: 'body',
             scripts: [
-                'https://unpkg.com/react@15/dist/react.min.js',
-                'https://unpkg.com/react-dom@15/dist/react-dom.min.js'
+                'https://unpkg.com/react@15/dist/react' + min + '.js',
+                'https://unpkg.com/react-dom@15/dist/react-dom' + min + '.js'
             ]
         })
     ]

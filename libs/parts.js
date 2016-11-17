@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const PurifyCSSPlugin = require('purifycss-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
