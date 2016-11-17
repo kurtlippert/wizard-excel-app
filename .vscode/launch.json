@@ -5,7 +5,7 @@
             "name": "Launch",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}\\rollup.js",
+            "program": "${workspaceRoot}\\webpack.config.js",
             "stopOnEntry": false,
             "args": [],
             "cwd": "${workspaceRoot}",
@@ -15,7 +15,8 @@
                 "--nolazy"
             ],
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "npm_lifecycle_event": "webpack:build"
             },
             "console": "internalConsole",
             "sourceMaps": false,
