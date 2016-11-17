@@ -25,9 +25,15 @@ const common = {
         src: PATHS.src,
 
     },
+
     output: {
         path: PATHS.dist,
         filename: '[name].js'
+    },
+
+    externals: {
+        'react': 'React', 
+        'react-dom' : 'ReactDOM' 
     },
 
     resolve: {
@@ -60,7 +66,12 @@ const common = {
     plugins: [
         new HtmlWebpackPlugin({
             template: 'index.template.ejs',
-            inject: 'body'
+            title: 'Onboarding Wizard',
+            inject: 'body',
+            scripts: [
+                'https://unpkg.com/react@15/dist/react.min.js',
+                'https://unpkg.com/react-dom@15/dist/react-dom.min.js'
+            ]
         })
     ]
 };
@@ -69,8 +80,7 @@ var config;
 
 switch (process.env.npm_lifecycle_event) {
     case 'webpack:build':
-        // console.log(PATHS.style);
-        // console.log(glob.sync(PATHS.src + '/**/*.scss'));
+    case 'stats':
         config = merge(
             common,
 
@@ -78,7 +88,12 @@ switch (process.env.npm_lifecycle_event) {
                 devtool: 'source-map',
                 output: {
                     path: PATHS.dist,
+
+                    // Tweak this to match your GitHub project name
+                    // publicPath: '/wizard-excel-app/',
+
                     filename: '[name].[chunkhash].js',
+
                     // This is used for require.ensure.
                     // The setup will work without but this is useful to set.
                     chunkFilename: '[chunkhash].js'
@@ -94,14 +109,18 @@ switch (process.env.npm_lifecycle_event) {
                 'production'
             ),
 
-            parts.extractBundle({
-                name: 'react',
-                entries: ['react', 'react-dom']
-            }),
+            // parts.extractBundle({
+            //     name: 'react',
+            //     entries: ['react', 'react-dom']
+            // }),
 
             parts.minify(),
 
             parts.extractCSS(glob.sync(PATHS.src + '/**/*.scss'))
+
+            // parts.compress()
+
+            // parts.purifyCSS([PATHS.src])
 
             // parts.processCSS()
         );
@@ -124,4 +143,6 @@ switch (process.env.npm_lifecycle_event) {
         );
 }
 
-module.exports = validate(config);
+module.exports = validate(config, {
+    quiet: true
+});
