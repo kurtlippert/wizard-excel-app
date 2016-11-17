@@ -90,7 +90,7 @@ module.exports = React;
 /* 3 */
 /***/ function(module, exports) {
 
-module.exports = reactDOM;
+module.exports = ReactDOM;
 
 /***/ },
 /* 4 */
