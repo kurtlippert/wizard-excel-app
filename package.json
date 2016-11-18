@@ -25,6 +25,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "material-ui": "^0.16.4",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-free-style": "^3.0.0",
