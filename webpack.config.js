@@ -75,6 +75,9 @@ const common = {
             scripts: [
                 'https://unpkg.com/react@15/dist/react' + min + '.js',
                 'https://unpkg.com/react-dom@15/dist/react-dom' + min + '.js'
+            ],
+            links: [
+                'https://fonts.googleapis.com/css?family=Roboto:300,400,500'
             ]
         })
     ]
