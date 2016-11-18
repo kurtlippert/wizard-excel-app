@@ -19,6 +19,7 @@
     "include": [
         "./node_modules/@types/react/index.d.ts",
         "./node_modules/@types/react-dom/index.d.ts",
+        "./node_modules/@types/material-ui/index.d.ts",
         "src/**/*"
     ],
     "exclude": [
