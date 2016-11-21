@@ -60,8 +60,8 @@ exports.setupCSS = function (paths) {
         module: {
             loaders: [
                 {
-                    test: /\.scss$/,
-                    loaders: ['style', 'css?sourceMap&modules!sass?sourceMap'],
+                    test: /\.css$/,
+                    loaders: ['style', 'css?sourceMap&modules'],
                     include: paths
                 }
             ]

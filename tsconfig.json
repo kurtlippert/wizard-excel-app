@@ -14,12 +14,15 @@
         "noImplicitThis": true,
         "noUnusedParameters": true,
         "strictNullChecks": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowJs": true
     },
     "include": [
         "./node_modules/@types/react/index.d.ts",
         "./node_modules/@types/react-dom/index.d.ts",
         "./node_modules/@types/material-ui/index.d.ts",
+        "./node_modules/@types/react-tap-event-plugin/index.d.ts",
+        "./node_modules/semantic-react/index.d.ts",
         "src/**/*"
     ],
     "exclude": [
