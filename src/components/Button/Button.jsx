@@ -3,12 +3,12 @@ import * as React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 
-const style: Object = {
+const style = {
     margin: 12
 };
 
 export class NewButton extends React.Component<{}, {}> {
-    render(): JSX.Element {
+    render() {
         return (
             <MuiThemeProvider>
                 <RaisedButton label="Click Me" style={style} />

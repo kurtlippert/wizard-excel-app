@@ -14,7 +14,7 @@ import { NewButton } from './components/Button';
 // Styles
 import './index.scss';
 
-function App(): JSX.Element {
+function App() {
     return (
         <div>
             <Hello compiler="TypeScript" framework="React" />
@@ -23,12 +23,7 @@ function App(): JSX.Element {
     );
 }
 
-const root: HTMLElement | null = document.getElementById('root');
-if (root !== null) {
-    render(
-        <App />,
-        root
-    );    
-} else {
-    console.error('missing root element');
-}
+render(
+    <App />,
+    document.getElementById('root')
+);
