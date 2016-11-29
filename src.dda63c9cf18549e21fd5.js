@@ -140,17 +140,30 @@ function NewButton() {
 //     }
 // }
 
-function Hello() {
+function Hello(_ref) {
+    var compiler = _ref.compiler,
+        framework = _ref.framework;
+
     return __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](
         'h1',
         { className: __WEBPACK_IMPORTED_MODULE_1__Hello_css__["blueColor"] + ' ' + __WEBPACK_IMPORTED_MODULE_1__Hello_css__["whiteBackgroundColor"] },
         'Hello from ',
-        this.props.compiler,
+        compiler,
         ' and ',
-        this.props.framework,
+        framework,
         '!'
     );
 }
+
+Hello.propTypes = {
+    compiler: __WEBPACK_IMPORTED_MODULE_0_react__["PropTypes"].string,
+    framework: __WEBPACK_IMPORTED_MODULE_0_react__["PropTypes"].string
+};
+
+Hello.defaultProps = {
+    compiler: 'babel',
+    framework: 'React'
+};
 
 /* harmony default export */ exports["a"] = Hello;
 
@@ -221,4 +234,4 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_react_dom__["render"])(__WEBPA
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=src.c478ecbc5ca948c1fd9c.js.map
+//# sourceMappingURL=src.dda63c9cf18549e21fd5.js.map
