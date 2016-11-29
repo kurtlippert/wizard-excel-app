@@ -225,7 +225,7 @@ function App() {
     return __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](
         'div',
         null,
-        __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_2__components_Hello__["a" /* default */], { compiler: 'TypeScript', framework: 'React' }),
+        __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_2__components_Hello__["a" /* default */], null),
         __WEBPACK_IMPORTED_MODULE_0_react__["createElement"](__WEBPACK_IMPORTED_MODULE_3__components_Button__["a" /* default */], null)
     );
 }
@@ -234,4 +234,4 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_react_dom__["render"])(__WEBPA
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=src.dda63c9cf18549e21fd5.js.map
+//# sourceMappingURL=src.530ef1b20f58638d1794.js.map
