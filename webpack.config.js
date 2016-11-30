@@ -4,19 +4,28 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const validate = require('webpack-validator');
 const parts = require('./libs/parts');
-const glob = require('glob');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const min = (process.env.npm_lifecycle_event === 'webpack:build') ?
-            '.min' :
-            '';
+// Build (for prod) or Serve (dev)
+const TARGET = process.env.npm_lifecycle_event;
+
+// Set Babel env. Important for HMR
+process.env.BABEL_ENV = TARGET;
+
+// minified versions of react and react dom
+// to be applied via cdn in our template.ejs file (for prod)
+const min = (TARGET === 'build') ? '.min' : '';
 
 const PATHS = {
     // src: path.join(__dirname, 'src', '**', '*.tsx'),
     // style: path.join(__dirname, 'src', '**', '*.css'),
     // src: path.join(__dirname, 'src'),
     src: path.join(__dirname, 'src'),
-    dist: path.join(__dirname, 'dist')
+    dist: path.join(__dirname, 'dist'),
+    semantic: path.join(__dirname, 'node_modules', 'semantic-ui-react'),
+    vendor: [
+        path.join(__dirname, 'node_modules', 'semantic-ui-css', 'semantic.css')
+    ]
 };
 
 const common = {
@@ -26,7 +35,7 @@ const common = {
     entry: {
         // src: glob.sync(PATHS.src),
         // style: glob.sync(PATHS.style)
-        src: PATHS.src,
+        src: PATHS.src
     },
 
     output: {
@@ -40,28 +49,26 @@ const common = {
     },
 
     resolve: {
-        // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js']
+        extensions: ['.js', '.jsx']
     },
 
     module: {
         loaders: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
             {
-                test: /\.tsx?$/,
+                test: /\.(js|jsx)?$/,
                 loaders: [
                     // 'awesome-typescript-loader',
-                    'awesome-typescript-loader',
-                    'tslint-loader'
-                ]
-            }
-        ],
-
-        preLoaders: [
-            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            {
-                test: /\.js$/,
-                loader: 'source-map-loader'
+                    //'tslint-loader'
+                    // Enable caching for improved performance during development
+                    // It uses default OS directory by default. If you need
+                    // something more custom, pass a path to it.
+                    // I.e., babel?cacheDirectory=<path>
+                    'babel-loader?cacheDirectory'
+                ],
+                // Parse only app files! Without this it will go through
+                // the entire project. In addition to being slow,
+                // that will most likely result in an error.
+                include: [ PATHS.src, PATHS.semantic]
             }
         ]
     },
@@ -73,11 +80,8 @@ const common = {
             title: 'Onboarding Wizard',
             inject: 'body',
             scripts: [
-                'https://unpkg.com/react@15/dist/react' + min + '.js',
-                'https://unpkg.com/react-dom@15/dist/react-dom' + min + '.js'
-            ],
-            links: [
-                'https://fonts.googleapis.com/css?family=Roboto:300,400,500'
+                '//unpkg.com/react@15/dist/react' + min + '.js',
+                '//unpkg.com/react-dom@15/dist/react-dom' + min + '.js'                
             ]
         })
     ]
@@ -85,8 +89,8 @@ const common = {
 
 var config;
 
-switch (process.env.npm_lifecycle_event) {
-    case 'webpack:build':
+switch (TARGET) {
+    case 'build':
     case 'stats':
         config = merge(
             common,
@@ -121,13 +125,17 @@ switch (process.env.npm_lifecycle_event) {
             //     entries: ['react', 'react-dom']
             // }),
 
-            parts.minify(),
+            // parts.minify(),
 
-            parts.extractCSS(glob.sync(PATHS.src + '/**/*.scss'))
+            // parts.processCSS(glob.sync(PATHS.src + '/**/*.css'), PATHS.src, PATHS.dist)
+
+            parts.extractCSS(PATHS.src, PATHS.vendor, PATHS.dist)
+
+            // parts.externalCSS(PATHS.style)
 
             // parts.compress()
 
-            // parts.purifyCSS([PATHS.src])
+            // parts.purifyCSS([PATHS.semantic])
 
             // parts.processCSS()
         );
@@ -145,7 +153,7 @@ switch (process.env.npm_lifecycle_event) {
             parts.devServer({
                 paths: PATHS,
                 host: process.env.HOST,
-                port: '3000'
+                port: 3000
             })
         );
 }

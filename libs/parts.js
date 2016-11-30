@@ -1,13 +1,14 @@
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const CompressionPlugin = require('compression-webpack-plugin');
+// const CompressionPlugin = require('compression-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const PurifyCSSPlugin = require('purifycss-webpack-plugin');
 
-const hashFile = require('hash-file');
-const hashFiles = require('hash-files');
 const fs = require('fs');
+const pth = require('path');
 const crypto = require('crypto');
+const glob = require('glob');
 
 exports.devServer = function (options) {
     return {
@@ -61,7 +62,7 @@ exports.setupCSS = function (paths) {
             loaders: [
                 {
                     test: /\.css$/,
-                    loaders: ['style', 'css?sourceMap&modules'],
+                    loaders: ['style-loader', 'css-loader?sourceMap&modules'],
                     include: paths
                 }
             ]
@@ -142,12 +143,23 @@ exports.clean = function (path) {
     }
 }
 
-exports.extractCSS = function (paths) {
+exports.extractCSS = function (src, vendorFiles, dist) {   
     // Calc hash for style bundle name
-    const fsContents = paths.map(function (path) {
+    const localFiles = glob.sync(src + '/**/*.scss');
+
+    const localContents = localFiles.map(function (path) {
         return fs.readFileSync(path);
     }).join();
-    const fileHash = crypto.createHash('sha256').update(fsContents).digest("hex").substring(0, 20);
+
+    const vendorContents = vendorFiles.map(function (path) {
+        return fs.readFileSync(path);
+    }).join();
+
+    const localHash = crypto.createHash('sha256').update(localContents).digest("hex").substring(0, 20);
+    const vendorHash = crypto.createHash('sha256').update(vendorContents).digest("hex").substring(0, 20);
+
+    let extractLocal = new ExtractTextPlugin('style.' + localHash + '.css');
+    let extractVendor = new ExtractTextPlugin('vendor.' + vendorHash + '.css');
 
     // The module
     return {
@@ -155,68 +167,95 @@ exports.extractCSS = function (paths) {
             loaders: [
                 // Extract CSS during build
                 {
-                    test: /\.scss$/,
-                    // If you want to pass more loaders to the ExtractTextPlugin, 
-                    // you should use ! syntax. 
-                    // Example: ExtractTextPlugin.extract({ ..., loader: 'css!postcss'}).
-                    loader: ExtractTextPlugin.extract({
-                        fallbackLoader: 'style',
-                        loader: 'css?sourceMap&modules!sass?sourceMap'
+                    test: /\.scss$/i,
+                    loader: extractLocal.extract({
+                        fallbackLoader: 'style-loader',
+                        loader: 'css-loader?sourceMap&modules!sass-loader?sourceMap'
                     })
-                    // include: paths
+                    // include: src
+                },
+                {
+                    test: /\.css$/i,
+                    loader: extractVendor.extract({
+                        fallbackLoader: 'style-loader',
+                        loader: 'css-loader'
+                    })
+                    // include: vendorFiles
+                },
+                {
+                    test: /\.(png|jpg)$/,
+                    loaders: [
+                        'url-loader?limit=25000'
+                        // 'image-webpack-loader'
+                    ]
+                },
+                {
+                    test: /\.(woff|woff2|ttf|eot)$/,
+                    loader: 'url-loader?limit=50000'
+                },
+                {
+                    test: /\.svg$/,
+                    loaders: [
+                        'file-loader'
+                        // 'image-webpack-loader'
+                    ]                    
                 }
             ]
         },
-        // postcss: function () {
-        //     return [
-        //         require('postcss-nesting'),
-        //         require('postcss-advanced-variables')
-        //     ]
-        // },
         plugins: [
-            // new webpack.LoaderOptionsPlugin({
-            //     options: {
-            //         postcss: [
-            //             require('postcss-nested')(),
-            //             require('postcss-simple-vars')()
-            //         ]
-            //     }
-            // }),
-
             // Output extracted CSS to a file
-            new ExtractTextPlugin({
-                filename: 'style.' + fileHash + '.css',
+            extractLocal,
+            extractVendor,
+            new PurifyCSSPlugin({
+                basePath: dist + '/vendor.' + vendorHash + '.css',
+                paths: [ 'index.html' ]
             }),
-            new OptimizeCSSAssetsPlugin()
+            // new OptimizeCSSAssetsPlugin()
         ]
     };
 }
 
-exports.compress = function () {
+exports.externalCSS = function (libPath) {
+
+    let extractVendor = new ExtractTextPlugin({ filename: 'vendor.css' });
+
+    console.log(libPath);
+
     return {
+        module: {
+            loaders: [
+                {
+                    test: /\.css$/,
+                    loader: extractVendor.extract({
+                        fallbackLoader: 'style-loader',
+                        loader: 'css-loader?sourceMap'
+                    }),
+                    include: libPath
+                }
+            ]
+        },
         plugins: [
-            new CompressionPlugin({
-                test: /\.js$|\.html$|\.css$/
-            })
+            extractVendor,
+            new OptimizeCSSAssetsPlugin()
         ]
     }
 }
 
-// exports.purifyCSS = function (paths) {
-//     console.log(process.cwd() + '/dist');
-//     return {
-//         plugins: [
-//             new PurifyCSSPlugin({
-//                 basePath: process.cwd(),
+exports.purifyCSS = function (paths) {
+    console.log(process.cwd() + '/dist');
+    return {
+        plugins: [
+            new PurifyCSSPlugin({
+                basePath: process.cwd(),
 
-//                 // 'paths' is used to point purifyCSS to files not
-//                 // visible to Webpack. You can pass glob patterns to it
-//                 paths: paths,
+                // 'paths' is used to point purifyCSS to files not
+                // visible to Webpack. You can pass glob patterns to it
+                paths: paths,
 
-//                 options: {
-//                     output: process.cwd + 'distcss'
-//                 }
-//             })
-//         ]
-//     };
-// }
+                options: {
+                    output: process.cwd + 'distcss'
+                }
+            })
+        ]
+    };
+}
