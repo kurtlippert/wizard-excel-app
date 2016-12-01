@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -77,7 +77,6 @@ module.exports = React;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_semantic_ui_react_src_elements_Button__ = __webpack_require__(6);
 
 
 // import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -85,7 +84,7 @@ module.exports = React;
 
 // import 'semantic-ui-css/semantic.css';
 
-
+// import { Button } from 'semantic-ui-react/src';
 
 // const style = {
 //     margin: 12
@@ -106,13 +105,21 @@ module.exports = React;
 //     }
 // }
 
-function NewButton() {
+// function NewButton() {
+//     return (
+//         <Button>
+//             Click Me
+//         </Button>
+//     );
+// }
+
+var NewButton = function NewButton() {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        __WEBPACK_IMPORTED_MODULE_1_semantic_ui_react_src_elements_Button__["a" /* default */],
-        null,
+        'button',
+        { className: 'ui button' },
         'Click Me'
     );
-}
+};
 
 /* harmony default export */ exports["a"] = NewButton;
 
@@ -123,7 +130,7 @@ function NewButton() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Hello_scss__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Hello_scss__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Hello_scss___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Hello_scss__);
 
 
@@ -186,20 +193,13 @@ module.exports = ReactDOM;
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony default export */ exports["a"] = Button;
-
-/***/ },
-/* 7 */
 /***/ function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 module.exports = {"blueColor":"Hello__blueColor___3nt0r","whiteBackgroundColor":"Hello__whiteBackgroundColor___1QyXu"};
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -245,4 +245,4 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_react_dom__["render"])(__WEBPA
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=src.600f5fc1998ad91b3a99.js.map
+//# sourceMappingURL=src.32214db257d0fbcd0446.js.map
