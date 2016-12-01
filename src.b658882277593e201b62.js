@@ -233,6 +233,7 @@ module.exports = {"blueColor":"Hello__blueColor___3nt0r","whiteBackgroundColor":
 // import './main.css';
 
 function App() {
+    console.log('wat?');
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         null,
@@ -245,4 +246,4 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_react_dom__["render"])(__WEBPA
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=src.32214db257d0fbcd0446.js.map
+//# sourceMappingURL=src.b658882277593e201b62.js.map
