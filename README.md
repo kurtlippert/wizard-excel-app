@@ -1,2 +1,2 @@
-# wizard-excel-app
-POC TypeScript / React / Webpack Project
+# onboarding-wizard
+POC ES6 / Babel / React / Webpack Project
