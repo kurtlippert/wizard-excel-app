@@ -62,7 +62,7 @@ exports.setupCSS = function (paths) {
                     test: /\.scss$/i,
                     loaders: [
                         'style-loader', 
-                        'css-loader?sourceMap&modules!sass-loader?sourceMap'
+                        'css-loader?sourceMap&modules&localIdentName=[name]__[local]___[hash:base64:5]!sass-loader?sourceMap'
                     ],
                     // include: paths.src
                 },
