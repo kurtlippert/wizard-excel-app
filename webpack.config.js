@@ -17,13 +17,9 @@ process.env.BABEL_ENV = TARGET;
 const min = (TARGET === 'build') ? '.min' : '';
 
 const PATHS = {
-    // src: path.join(__dirname, 'src', '**', '*.tsx'),
-    // style: path.join(__dirname, 'src', '**', '*.css'),
-    // src: path.join(__dirname, 'src'),
     src: path.join(__dirname, 'src'),
     dist: path.join(__dirname, 'dist'),
-    semantic: path.join(__dirname, 'node_modules', 'semantic-ui-react'),
-    vendor: [
+    vendorStyles: [
         path.join(__dirname, 'node_modules', 'semantic-ui-css', 'semantic.css')
     ]
 };
@@ -33,8 +29,6 @@ const common = {
     // We'll be using the latter form given it's
     // convenient with more complex configurations.
     entry: {
-        // src: glob.sync(PATHS.src),
-        // style: glob.sync(PATHS.style)
         src: PATHS.src
     },
 
@@ -55,7 +49,7 @@ const common = {
     module: {
         loaders: [
             {
-                test: /\.(js|jsx)?$/,
+                test: /\.jsx$/,
                 loaders: [
                     // 'awesome-typescript-loader',
                     //'tslint-loader'
@@ -68,7 +62,7 @@ const common = {
                 // Parse only app files! Without this it will go through
                 // the entire project. In addition to being slow,
                 // that will most likely result in an error.
-                include: [ PATHS.src, PATHS.semantic]
+                include: PATHS.src
             }
         ]
     },
@@ -96,7 +90,7 @@ switch (TARGET) {
             common,
 
             {
-                devtool: 'source-map',
+                // devtool: 'source-map',
                 output: {
                     path: PATHS.dist,
 
@@ -125,26 +119,16 @@ switch (TARGET) {
             //     entries: ['react', 'react-dom']
             // }),
 
-            // parts.minify(),
+            parts.minify(),
 
-            // parts.processCSS(glob.sync(PATHS.src + '/**/*.css'), PATHS.src, PATHS.dist)
-
-            parts.extractCSS(PATHS.src, PATHS.vendor, PATHS.dist)
-
-            // parts.externalCSS(PATHS.style)
-
-            // parts.compress()
-
-            // parts.purifyCSS([PATHS.semantic])
-
-            // parts.processCSS()
+            parts.extractCSS(PATHS.src, PATHS.vendorStyles, PATHS.dist)
         );
         break;
     default:
         config = merge(
             common,
 
-            parts.setupCSS(),
+            parts.setupCSS(PATHS),
 
             {
                 devtool: 'eval-source-map',
