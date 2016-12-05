@@ -1,12 +1,10 @@
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-// const CompressionPlugin = require('compression-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack-plugin');
 
 const fs = require('fs');
-const pth = require('path');
 const crypto = require('crypto');
 const glob = require('glob');
 
@@ -61,9 +59,35 @@ exports.setupCSS = function (paths) {
         module: {
             loaders: [
                 {
-                    test: /\.css$/,
-                    loaders: ['style-loader', 'css-loader?sourceMap&modules'],
-                    include: paths
+                    test: /\.scss$/i,
+                    loaders: [
+                        'style-loader', 
+                        'css-loader?sourceMap&modules!sass-loader?sourceMap'
+                    ],
+                    // include: paths.src
+                },
+                {
+                    test: /\.css$/i,
+                    loaders: [
+                        'style-loader',
+                        'css-loader'
+                    ],
+                    // include: paths.src
+                },
+                {
+                    test: /\.(png|jpg)$/,
+                    loader: 'url-loader?limit=25000',
+                    // include: paths.src                    
+                },
+                {
+                    test: /\.(woff|woff2|ttf|eot)$/,
+                    loader: 'url-loader?limit=50000',
+                    // include: paths.src                    
+                },
+                {
+                    test: /\.svg$/,
+                    loader: 'file-loader',
+                    // include: paths                    
                 }
             ]
         }
@@ -170,7 +194,7 @@ exports.extractCSS = function (src, vendorFiles, dist) {
                     test: /\.scss$/i,
                     loader: extractLocal.extract({
                         fallbackLoader: 'style-loader',
-                        loader: 'css-loader?sourceMap&modules!sass-loader?sourceMap'
+                        loader: 'css-loader?modules&localIdentName=[name]__[local]___[hash:base64:5]!sass-loader'
                     })
                     // include: src
                 },
@@ -201,16 +225,28 @@ exports.extractCSS = function (src, vendorFiles, dist) {
                     ]                    
                 }
             ]
-        },
+        },        
         plugins: [
             // Output extracted CSS to a file
             extractLocal,
             extractVendor,
+            // new webpack.LoaderOptionsPlugin({
+            //     options: {
+            //         postcss: [
+            //             require('uncss')({
+            //                 html: ['dist/*.html']
+            //             })
+            //         ]
+            //     }
+            // })
             new PurifyCSSPlugin({
-                basePath: dist + '/vendor.' + vendorHash + '.css',
-                paths: [ 'index.html' ]
+                basePath: dist,
+                paths: [ 'index.html' ],
+                purifyOptions: {
+                    whitelist: [ '*___*' ] // leave locally scoped css (css module spec)
+                }
             }),
-            // new OptimizeCSSAssetsPlugin()
+            new OptimizeCSSAssetsPlugin()
         ]
     };
 }
