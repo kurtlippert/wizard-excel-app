@@ -5,13 +5,16 @@ import 'semantic-ui-css/semantic.css';
 
 // Components
 import Hello from './components/Hello';
-import NewButton from './components/Button';
+import Button from './components/Button';
+
+// Opt-in to Webpack hot module replacement
+if (module.hot) module.hot.accept();
 
 function App() {
     return (
         <div>
             <Hello compiler="Babel" framework="React" />
-            <NewButton />
+            <Button text="YOOOOOOO" />
         </div>
     );
 }
