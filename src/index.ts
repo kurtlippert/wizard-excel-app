@@ -4,31 +4,31 @@ import { DOMSource } from '@cycle/dom/xstream-typings';
 import { run } from '@cycle/xstream-run';
 
 interface ISources {
-  dom: DOMSource;
+  DOM: DOMSource;
 }
 
 interface ISinks {
-  dom: Stream<VNode>;
+  DOM: Stream<VNode>;
 }
 
 function main(sources: ISources): ISinks {
-  const dom = sources.dom;
-  const sinks: ISinks = {
-  dom: dom.select('.field').events('input')
+  const inputEv$ = sources.DOM.select('.field').events('input');
+  const name$ = inputEv$
     .map(ev => (ev.target as HTMLInputElement).value)
-    .startWith('')
-    .map(name =>
-      div('#root', [
+    .startWith('');
+  return {
+    DOM: name$.map(name =>
+      div([
         label('Name:'),
-        input('.field', { attrs: { type: 'text', value: name } }),
-        hr(),
-        h1(name ? `Hello, ${name}!` : 'Hello! Please enter your name...'),
-      ])
+        input('.field', { attrs: { type: 'text' } }),
+        h1(`Hello ${name}!`)
+      ])      
     )
-  };
-  return sinks;
+  }
 }
 
-run(main, {
-  dom: makeDOMDriver('#app')
-})
+const drivers = {
+  DOM: makeDOMDriver('#app'),
+};
+
+run(main, drivers);
