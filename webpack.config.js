@@ -121,7 +121,7 @@ switch (TARGET) {
 
       parts.extractBundle({
           name: 'cycle',
-          entries: ['@cycle/xstream-run', '@cycle/dom']
+          entries: ['@cycle/xstream-run', '@cycle/dom', 'xstream']
       }),
 
       parts.minify(),
