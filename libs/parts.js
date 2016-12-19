@@ -30,7 +30,7 @@ exports.devServer = function (options) {
 
       // Unlike the cli flag, this doesn't set
       // HotModuleReplacementPlugin!
-      hot: true,
+      // hot: true,
       inline: true,
 
       // Display only errors to reduce the amount of output.
@@ -46,13 +46,13 @@ exports.devServer = function (options) {
       host: options.host, // Defaults to `localhost`
       port: options.port, // Defaults to 8080
     },
-    plugins: [
-      // Enable multi-pass compilation for enhanced performance
-      // in larger projects. Good default.
-      new webpack.HotModuleReplacementPlugin({
-        multiStep: true,
-      }),
-    ],
+    // plugins: [
+    //   // Enable multi-pass compilation for enhanced performance
+    //   // in larger projects. Good default.
+    //   new webpack.HotModuleReplacementPlugin({
+    //     multiStep: true,
+    //   }),
+    // ],
   };
 };
 
