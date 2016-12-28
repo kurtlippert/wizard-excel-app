@@ -21,8 +21,7 @@
     ]
   },
   "include": [
-    "src/**/*",
-    "./node_modules/xstream/index.d.ts"
+    "src/**/*"
   ],
   "exclude": [
     // "node_modules",
