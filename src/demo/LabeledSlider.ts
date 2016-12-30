@@ -1,6 +1,6 @@
 // Cycle
 import { Stream, MemoryStream } from 'xstream';
-import { div, span, input, makeDOMDriver, VNode } from '@cycle/dom';
+import { div, span, input, VNode } from '@cycle/dom';
 import isolate from '@cycle/isolate';
 
 // TypeScript Typings
@@ -9,12 +9,12 @@ import { DOMSource } from '@cycle/dom/xstream-typings';
 // Sources: input
 interface Sources {
   readonly DOM: DOMSource;
-  readonly props$: Stream<Props>;
+  readonly props: Props;
 }
 
 // Sinks: output
 // NOTE: although these properties are both MemoryStreams, they could be regular streams.
-// It's just that in our case, we needed to use the 'flatten()' and/or 'remember()' methods
+// It's just that in our case, we needed to use the 'remember()' method
 // which create this new 'MemoryStream' data structure
 interface Sinks {
   readonly DOM: MemoryStream<VNode>;
@@ -31,42 +31,30 @@ interface Props {
 }
 
 function LabeledSlider(sources: Sources): Sinks {
+
+  // Intent
   const newValue$ = sources.DOM
     .select('.slider')
     .events('input')
     .map(ev => parseInt((ev.target as HTMLInputElement).value));
 
-  // for each Prop object in the property stream...
-  // map each Prop object...
-  // to a new Prop object with the index of a newValue (in the newValue stream)...
-  // mapped to the same index of the Prop Object in the property stream
-  //
-  // newValue Stream - newValue$ (the slider the user manipulates):
-  // ---7---8---9---10---9---8
-  // 
-  // property Stream - props$ (the property object):
-  // {...}
-  //
-  // Not much of a stream, but it's mainly there to map to the newValue Stream
-  // {orig, value: 70}---{...orig, value: 7 }---{...orig, value: 8 }---...
-  // ^^^^^^^^^^^^^^^^^
-  //    Start With
-  //
-  // 
-  const state$ = sources.props$
+  // Model
+  // The state of the slider at each input.
+  // Basically, we want to create a new stream with each item in the stream
+  // as a Prop object with the updated value.
+  // We had to make the 'props' a stream in order to do this.
+  // Flatten the stream of streams so we only get back 1 stream
+  // Remember just keeps the most recently emitted event in memory.
+  // Without remember, the sliders don't render (maybe something to do with .startWith??)
+  const state$ = Stream.of(sources.props)
     .map(props => newValue$
-      .map(val => ({
-        label: props.label,
-        unit: props.unit,
-        min: props.min,
-        value: val,
-        max: props.max
-      }))
+      .map(val => ({ ...props, value: val }))
       .startWith(props)
     )
     .flatten()
     .remember();
-
+  
+  // View
   const vdom$ = state$
     .map(state => 
       div('.labeled-slider', [
@@ -75,19 +63,20 @@ function LabeledSlider(sources: Sources): Sinks {
         ),
         input('.slider', {
           attrs: { type: 'range', min: state.min, max: state.max, value: state.value }
-        })
-      ])
+        }),
+      ]),
     );
 
-  const sinks = {
+  // Return the sinks
+  // NOTE: need the value stream to calculate bmi
+  return {
     DOM: vdom$,
     value$: state$.map(state => state.value),
   };
- 
-  return sinks;
 }
 
 // Want to isolate components so that duplicate DOM selects (i.e. '.select('weight')')
-// don't conflict with one another
+// don't conflict with one another. Returning another function that calls our
+// (isolated) component, resolves this issue
 export default (sources: Sources) =>
     isolate(LabeledSlider)(sources)
