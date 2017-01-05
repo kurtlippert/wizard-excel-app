@@ -7,7 +7,7 @@ const merge = require('webpack-merge');
 const validate = require('webpack-validator');
 const parts = require('./libs/parts');
 // const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const { CheckerPlugin } = require('awesome-typescript-loader');
+// const { CheckerPlugin } = require('awesome-typescript-loader');
 
 // Build (for prod) or Serve (dev)
 const TARGET = process.env.npm_lifecycle_event;
@@ -32,7 +32,8 @@ const common = {
   // We'll be using the latter form given it's
   // convenient with more complex configurations.
   entry: {
-    src: PATHS.src,
+    src: path.resolve(PATHS.src, 'elm/Main.elm'),
+    //src: PATHS.src
   },
 
   output: {
@@ -40,13 +41,13 @@ const common = {
     filename: '[name].js',
   },
 
-  // externals: {
+  // externals: 
   //   react: 'React',
   //   'react-dom': 'ReactDOM',
   // },
 
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.elm'],
   },
 
   module: {
@@ -73,7 +74,13 @@ const common = {
         test: /\.ts$/,
         loader: 'awesome-typescript-loader',
       },
+      {
+        test: /\.elm$/,
+        loader: 'elm-webpack-loader?cwd=' + __dirname
+      },
     ],
+
+    noParse: /\.elm$/
   },
 
   // If production, I want minified cdn version, full otherwise
@@ -85,7 +92,7 @@ const common = {
       scripts: [
       ],
     }),
-    new CheckerPlugin(),
+//    new CheckerPlugin(),
   ],
 };
 
@@ -119,10 +126,10 @@ switch (TARGET) {
 
       parts.setFreeVariable('process.env.NODE_ENV', 'production'),
 
-      parts.extractBundle({
-          name: 'cycle',
-          entries: ['@cycle/xstream-run', '@cycle/dom', 'xstream']
-      }),
+//      parts.extractBundle({
+//          name: 'cycle',
+//          entries: ['@cycle/xstream-run', '@cycle/dom', 'xstream']
+//      }),
 
       parts.minify(),
 
