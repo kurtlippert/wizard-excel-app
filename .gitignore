@@ -3,3 +3,4 @@ elm-stuff
 dist
 .vscode
 *.log
+elm-cmds.txt
