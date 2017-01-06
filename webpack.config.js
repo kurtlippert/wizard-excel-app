@@ -1,159 +1,136 @@
+var path              = require( 'path' );
+var webpack           = require( 'webpack' );
+var merge             = require( 'webpack-merge' );
+var HtmlWebpackPlugin = require( 'html-webpack-plugin' );
+var ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+var PurifyCSSPlugin   = require( 'purifycss-webpack-plugin' );
+var OptimizeCSSPlugin = require( 'optimize-css-assets-webpack-plugin' );
+var CleanDistPlugin   = require( 'clean-webpack-plugin' ); 
+var entryPath         = path.join( __dirname, 'src/static/index.js' );
+var outputPath        = path.join( __dirname, 'dist' );
 
-/* eslint-disable import/no-extraneous-dependencies */
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack'); // eslint-disable-line no-unused-vars
-const merge = require('webpack-merge');
-const validate = require('webpack-validator');
-const parts = require('./libs/parts');
-// const ExtractTextPlugin = require('extract-text-webpack-plugin');
-// const { CheckerPlugin } = require('awesome-typescript-loader');
+console.log( 'WEBPACK GO!');
 
-// Build (for prod) or Serve (dev)
-const TARGET = process.env.npm_lifecycle_event;
+// determine build env
+var TARGET_ENV = process.env.npm_lifecycle_event === 'build' ? 'production' : 'development';
+var outputFilename = TARGET_ENV === 'production' ? '[name].[hash].js' : '[name].js'
 
-// Set Babel env. Important for HMR
-// process.env.BABEL_ENV = TARGET;
-
-// minified versions of react and react dom
-// to be applied via cdn in our template.ejs file (for prod)
-const min = (TARGET === 'build') ? '.min' : '';
-
-const PATHS = {
-  src: path.resolve(__dirname, 'src'),
-  dist: path.resolve(__dirname, 'dist'),
-  vendorStyles: [
-    path.resolve(__dirname, 'node_modules', 'semantic-ui-css', 'semantic.css'),
-  ],
-};
-
-const common = {
-  // Entry accepts a path or an object of entries.
-  // We'll be using the latter form given it's
-  // convenient with more complex configurations.
-  entry: {
-    src: path.resolve(PATHS.src, 'elm/Main.elm'),
-    //src: PATHS.src
-  },
+// common webpack config
+var commonConfig = {
 
   output: {
-    path: PATHS.dist,
-    filename: '[name].js',
+    path:       outputPath,
+    filename:   outputFilename,
   },
 
-  // externals: 
-  //   react: 'React',
-  //   'react-dom': 'ReactDOM',
-  // },
-
   resolve: {
-    extensions: ['.js', '.ts', '.elm'],
+    extensions: ['.js', '.elm']
   },
 
   module: {
+    noParse: /\.elm$/,
     loaders: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          // Enable caching for improved performance during development
-          // It uses default OS directory by default. If you need
-          // something more custom, pass a path to it.
-          // I.e., babel?cacheDirectory=<path>
-          cacheDirectory: true,
-          presets: ['es2015'],
-          plugins: ['transform-object-rest-spread'],
-        },
-
-        // Parse only app files! Without this it will go through
-        // the entire project. In addition to being slow,
-        // that will most likely result in an error.
-        include: PATHS.src,
+        test: /\.css$/i,
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader',
+        }),
       },
       {
-        test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
+        test: /\.(eot|ttf|woff|woff2|svg)$/,
+        loader: 'file-loader'
       },
       {
-        test: /\.elm$/,
-        loader: 'elm-webpack-loader?cwd=' + __dirname
+        test: /\.(png|jpg)$/,
+        loader: 'url-loader?limit=25000',
       },
-    ],
-
-    noParse: /\.elm$/
+      {
+        test: /\.(woff|woff2|ttf|eot)$/,
+        loader: 'url-loader?limit=50000',
+      },
+      {
+        test: /\.svg$/,
+        loader: 'file-loader',
+      },
+    ]
   },
 
-  // If production, I want minified cdn version, full otherwise
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'index.template.ejs',
-      title: 'Onboarding Wizard',
-      inject: 'body',
-      scripts: [
-      ],
+      template: 'src/static/index.template.ejs',
+      inject:   'body',
+      title:    'Onboarding Wizard'
     }),
-//    new CheckerPlugin(),
+
+    new ExtractTextPlugin('vendor.[chunkhash].css'),
   ],
-};
 
-let config;
-
-switch (TARGET) {
-  case 'build':
-  case 'stats':
-    config = merge(
-      common,
-
-      {
-        // devtool: 'source-map',
-        output: {
-          path: PATHS.dist,
-
-          // Tweak this to match your GitHub project name
-          // publicPath: '/wizard-excel-app/',
-
-          filename: '[name].[chunkhash].js',
-
-          // This is used for require.ensure.
-          // The setup will work without but this is useful to set.
-          chunkFilename: '[chunkhash].js',
-        },
-      },
-
-      // If we need to preserve dotfiles within 'dist' directory,
-      // use 'path.join(PATHS.dist, '*')' instead of 'PATHS.dist'
-      parts.clean(PATHS.dist),
-
-      parts.setFreeVariable('process.env.NODE_ENV', 'production'),
-
-//      parts.extractBundle({
-//          name: 'cycle',
-//          entries: ['@cycle/xstream-run', '@cycle/dom', 'xstream']
-//      }),
-
-      parts.minify(),
-
-      parts.extractCSS(PATHS.src, PATHS.vendorStyles, PATHS.dist)
-    );
-    break;
-  default:
-    config = merge(
-      common,
-
-      parts.setupCSS(PATHS),
-
-      {
-        devtool: 'eval-source-map',
-      },
-
-      parts.devServer({
-        paths: PATHS,
-        host: process.env.HOST,
-        port: 3000,
-      })
-    );
 }
 
-module.exports = validate(config, {
-  quiet: true,
-});
+// additional webpack settings for local env (when invoked by 'npm start')
+if ( TARGET_ENV === 'development' ) {
+  console.log( 'Serving locally...');
+
+  module.exports = merge( commonConfig, {
+
+    entry: [
+      'webpack-dev-server/client?http://localhost:8080',
+      entryPath
+    ],
+
+    devtool: 'eval-source-map',
+    
+    devServer: {
+      // serve index.html in place of 404 responses
+      historyApiFallback: true,
+    },
+
+    module: {
+      loaders: [
+        {
+          test:    /\.elm$/,
+          exclude: [/elm-stuff/, /node_modules/],
+          loader:  'elm-hot-loader!elm-webpack-loader?verbose=true&warn=true&debug=true'
+        },
+      ]
+    }
+  });
+}
+
+// additional webpack settings for prod env (when invoked via 'npm run build')
+if ( TARGET_ENV === 'production' ) {
+  console.log( 'Building for prod...');
+
+  module.exports = merge( commonConfig, {
+
+    entry: entryPath,
+
+    module: {
+      loaders: [
+        {
+          test:    /\.elm$/,
+          exclude: [/elm-stuff/, /node_modules/],
+          loader:  'elm-webpack-loader'
+        },
+      ]
+    },
+
+    plugins: [
+      // minify & mangle JS/CSS
+      new webpack.optimize.UglifyJsPlugin({
+          minimize:   true,
+          compressor: { warnings: false }
+          // mangle:  true
+      }),
+      new CleanDistPlugin('dist', {
+        root: __dirname
+      }),
+      new PurifyCSSPlugin({
+        basePath: outputPath,
+        paths: ['index.html']
+      }),
+      new OptimizeCSSPlugin()
+    ]
+  });
+}
